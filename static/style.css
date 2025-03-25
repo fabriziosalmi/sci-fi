@@ -230,7 +230,8 @@ label {
   border: none;
   border-radius: var(--rounded);
   cursor: pointer;
-  transition:  filter 0.3s ease;
+  transition: filter 0.3s ease;
+  padding-bottom: 8px;  /* Added to align with GitHub icon */
 }
 #themeToggle:hover {
   filter: brightness(1.5); /* Brighter on hover */
@@ -423,4 +424,24 @@ footer {
 a {
   color: var(--primary);
   text-decoration: none;
+}
+
+/* New background video style */
+.bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1;
+    object-fit: cover;
+}
+
+/* New rule for footer icons alignment */
+.footer-icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
 }

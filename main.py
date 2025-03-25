@@ -34,6 +34,7 @@ BASE_URL: str = os.getenv("BASE_URL", "http://localhost:1234")
 PROJECT_URL: str = os.getenv("PROJECT_URL", "https://github.com/fabriziosalmi/sci-fi")
 MAX_RETRIES: int = 3
 IMPROVEMENTS_DIR: str = "improvements"
+LLM_API_TYPE: str = os.getenv("LLM_API_TYPE", "openrouter")  # Added: API type: "openrouter" or "openai"
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "mysecret")
@@ -119,7 +120,7 @@ prompts: Dict[str, str] = load_prompts()
 
 def run_curl_command(prompt: str, api_key: str, base_url: str, model_name: str, max_tokens: int, temperature: float) -> str:
     """
-    Executes a curl command to interact with the OpenAI-compatible API.
+    Executes a curl command to interact with the LLM API.
     Returns the extracted content from the response, or an error message.
     """
     headers = {
@@ -134,9 +135,13 @@ def run_curl_command(prompt: str, api_key: str, base_url: str, model_name: str, 
         "temperature": temperature,
     }
 
-    # Combine BASE_URL with endpoint using urljoin
-    full_url = urljoin(base_url.rstrip('/') + '/', "chat/completions")
-
+    # Choose endpoint based on API type
+    if LLM_API_TYPE.lower() == "openai":
+        endpoint = "v1/chat/completions"
+    else:
+        endpoint = "chat/completions"
+    full_url = urljoin(base_url.rstrip('/') + '/', endpoint)
+    
     command = [
         "curl",
         "-X", "POST",
