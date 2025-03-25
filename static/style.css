@@ -420,3 +420,19 @@ footer {
 .submission-row {
   margin-bottom: 10px;
 }
+
+a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.dark-theme .hljs {
+  background: #171717;
+  color: #fff;
+  border: ;
+  border-radius: 10px;
+}
+
+pre {
+  background-color: #171717;
+}
