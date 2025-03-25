@@ -290,20 +290,14 @@ footer {
   flex: 3;
 }
 
-
+/* Updated .hljs styles for light and dark themes */
 .hljs {
-    background: #0d0d0d;
-    color: #fff;
+    background: var(--code-bg); /* Light theme background (e.g., #f6f8fa) */
+    color: var(--text-color);    /* Light theme text color */
 }
-
-/* Commit Message Specific Improvements */
-.output-section h2 {  /* Target the h2 within the output section */
-  color: var(--primary);
-  font-size: 1.9rem; /* Slightly smaller than other section headings */
-  margin-bottom: 0.8rem;
-  display: flex;        /* Make the heading a flex container */
-  align-items: center;  /* Vertically center the icon and text */
-  gap: 0.6rem;        /* Add some space between the icon and text */
+.dark-theme .hljs {
+    background: #0d0d0d;  /* Dark theme background */
+    color: #fff;         /* Dark theme text color */
 }
 
 .commit-container {
@@ -413,4 +407,16 @@ footer {
   padding-top: 0rem;
   padding-bottom: 2rem;
   margin-top: 0.2rem;
+}
+
+/* New style for improved code snippet in dark mode */
+.dark-theme .improved-code-snippet {
+    background-color: #2e3440;  /* Darker background for improved snippet */
+    color: #d8dee9;             /* Lighter text for readability */
+    border: 1px solid #3b4252;  /* Border matching dark theme */
+}
+
+
+.submission-row {
+  margin-bottom: 10px;
 }
