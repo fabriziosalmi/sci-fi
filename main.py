@@ -5,7 +5,7 @@ import json
 import time
 import datetime
 from dotenv import load_dotenv
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union
 import bleach
 import logging
 from pathlib import Path
@@ -369,7 +369,7 @@ def index() -> str:
     return render_template("index.html")
 
 @app.route("/improve", methods=["POST"])
-def improve() -> Tuple[Response, int] | Tuple[jsonify, int]:
+def improve() -> Union[Tuple[Response, int], Tuple[jsonify, int]]:
     """Handles the code improvement request, returning specific error codes."""
     data = request.get_json()
     if not data or "code" not in data:

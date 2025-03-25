@@ -1,3 +1,5 @@
 .env
 improvements/*
 .DS_Store
+.docker/
+docker-compose.override.yml
