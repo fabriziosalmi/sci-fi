@@ -33,7 +33,7 @@ MAX_RETRIES = 3
 IMPROVEMENTS_DIR_NAME = "improvements"
 LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
 # --- Default Development Secret Key (INSECURE - CHANGE FOR PRODUCTION) ---
-DEFAULT_DEV_SECRET_KEY = "dev_secret_key_please_change_in_prod"
+DEFAULT_DEV_SECRET_KEY = "b2be4yen1gwna5hry9o5bfcvy2hatei1"
 
 load_dotenv()
 
