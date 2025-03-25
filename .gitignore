@@ -3,3 +3,5 @@ improvements/*
 .DS_Store
 .docker/
 docker-compose.override.yml
+test_prompts.json
+__pycache__/

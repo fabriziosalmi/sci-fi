@@ -55,7 +55,7 @@ textarea, input, select, button {
   border: 1px solid var(--border-color);
   border-radius: var(--rounded);
   padding: 0.75rem; /* Increased padding */
-  background-color: var(--input-bg);
+  background-color: #242424eb;
   color: var(--text-color);
   font-family: inherit;
   transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.2s ease; /* Smoother transitions */
@@ -450,4 +450,9 @@ a {
 
 button.primary-btn {
   font-size: large;
+}
+
+#commit-message {
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
