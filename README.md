@@ -13,7 +13,7 @@ Sci-Fi Code Improver is a web application that enhances your programming code by
 - **Docker Support:** Easy deployment using Docker containers.
 - **API Flexibility:** Support for both OpenRouter and OpenAI APIs.
 - **Health Monitoring:** Built-in healthcheck and logging system.
-- **FreeTekno modding:** Background video FX and [Free Undeground Tekno Radio](https://radio.free-tekno.com) music for a unique UX!
+- **FreeTekno modding:** [Background video FX](https://pixabay.com/it/users/ceos_stock-13890949/) and [Free Undeground Tekno Radio](https://radio.free-tekno.com) music for a unique experience!
 
 ## Screenshot
 
