@@ -10,13 +10,37 @@ Sci-Fi Code Improver is a web application that enhances your programming code by
 - **Theme Toggle:** Switch between light and dark themes.
 - **Session Management:** Version history maintained in user sessions.
 - **Auto Language Detection:** Determines the coding language from the input.
-- **FreeTekno addons:** Background tripping video and [Free Undeground Tekno Radio](https://radio.free-tekno.com) music 🌀
+- **Docker Support:** Easy deployment using Docker containers.
+- **API Flexibility:** Support for both OpenRouter and OpenAI APIs.
+- **Health Monitoring:** Built-in healthcheck and logging system.
+- **FreeTekno modding:** Background video FX and [Free Undeground Tekno Radio](https://radio.free-tekno.com) music for a unique UX!
 
 ## Screenshot
 
 ![screenshot](https://github.com/fabriziosalmi/sci-fi/blob/main/static/sci-fi_screenshot.png?raw=true)
 
-## Installation
+## Quick Start with Docker
+
+```bash
+# Pull the Docker image
+docker pull fabriziosalmi/sci-fi:latest
+
+# Create a .env file with your configuration
+cat > .env << EOL
+OPENROUTER_API_KEY=your-api-key
+MODEL_NAME=qwen2.5-coder-3b-instruct-mlx
+MAX_TOKENS=2048
+TEMPERATURE=0.2
+CHUNK_SIZE=500
+CONTEXT_WINDOW=10
+BASE_URL=http://localhost:1234/v1
+EOL
+
+# Run the container
+docker run -p 7860:7860 --env-file .env fabriziosalmi/sci-fi:latest
+```
+
+## Traditional Installation
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/fabriziosalmi/sci-fi.git
@@ -29,61 +53,64 @@ Sci-Fi Code Improver is a web application that enhances your programming code by
    pip install -r requirements.txt
    ```
 3. **Configure Environment Variables:**
-   Create a `.env` file in the project root like this:
-   ```ini
-   OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxx
-   MODEL_NAME=google/gemini-2.0-pro-exp-02-05:free
-   MAX_TOKENS=2048
-   TEMPERATURE=0.2
-   CHUNK_SIZE=500
-   CONTEXT_WINDOW=10
-   BASE_URL=https://openrouter.ai/api/v1
+   Create a `.env` file in the project root with your configuration.
+
+## Docker Compose Setup
+1. **Create docker-compose.yml:**
+   ```yaml
+   version: '3.8'
+   services:
+     web:
+       image: fabriziosalmi/sci-fi:latest
+       ports:
+         - "7860:7860"
+       volumes:
+         - ./improvements:/app/improvements
+         - ./.env:/app/.env:ro
+       environment:
+         - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+         - MODEL_NAME=${MODEL_NAME}
+         - MAX_TOKENS=${MAX_TOKENS}
+         - TEMPERATURE=${TEMPERATURE}
+         - CHUNK_SIZE=${CHUNK_SIZE}
+         - CONTEXT_WINDOW=${CONTEXT_WINDOW}
+         - BASE_URL=${BASE_URL}
+       restart: unless-stopped
+   ```
+
+2. **Start the application:**
+   ```bash
+   docker-compose up -d
    ```
 
 ## Usage
-1. **Start the Flask Application:**
-   ```bash
-   python main.py
-   ```
-2. **Access the App:**
-   Open your browser and navigate to [http://localhost:7860](http://localhost:7860).
-3. **How It Works:**
-   - Paste your code into the text area.
-   - Click the magic icon to improve the code.
-   - View the improved code and generated commit message.
-   - Use the copy/download buttons to handle output.
+1. Access the app at [http://localhost:7860](http://localhost:7860)
+2. Paste your code into the text area
+3. Click the magic icon to improve the code
+4. View the improved code and generated commit message
+5. Use the copy/download buttons to handle output
 
-## File Structure
-- **main.py:** Flask application with routes for code improvement, API endpoints, and session handling.
-- **templates/index.html:** The main HTML file that integrates code input, output, and interactive UI elements.
-- **static/style.css:** Contains the styling for both light and dark themes along with responsive design adjustments.
-- **prompts.json:** Contains the prompts used for code improvement and commit message generation.
-- **requirements.txt:** Lists all project dependencies.
-- **.gitignore:** Excludes sensitive files and directories from version control.
+## API Configuration
+The application supports both OpenRouter and OpenAI APIs:
+- **OpenRouter:** Set `BASE_URL=https://openrouter.ai/api/v1`
+- **OpenAI:** Set `BASE_URL=https://api.openai.com/v1` and `LLM_API_TYPE=openai`
 
-## API Endpoints
-- **/**: Renders the main page.
-- **/improve:** Receives code and language, enhances the code using OpenAI, and returns improved code with a commit message.
-- **/detect_language:** Auto-detects the programming language from the input code.
-- **/clear_session:** Clears the session version history.
-- **/stream:** Provides server-sent events for debugging logs.
-
-## Testing
-The project includes tests written with pytest. To run tests:
-```bash
-pytest main.py
-```
+## Health Monitoring
+The Docker container includes:
+- Health checks every 30 seconds
+- JSON file logging with rotation to efficiently manage log data.
+- Maximum log file size of 10MB to prevent excessive disk usage.
+- Retains the 3 most recent log files for quick audits.
 
 ## Contributing
-Contributions are welcome! Please submit issues and pull requests via GitHub:
+Contributions are welcome! Please:
 - Fork the repository.
 - Create a new branch for your feature or bug fix.
-- Submit a pull request detailing your changes.
+- Submit a pull request with details of your changes.
+- (Consider linking to a CONTRIBUTING.md for more guidelines)
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ## Acknowledgements
-- This project uses OpenAI’s API for code improvement.
-- Front-end icons provided by Font Awesome.
-- Syntax highlighting by Highlight.js.
+- Docker support for streamlined deployment.
