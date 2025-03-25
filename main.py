@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, jsonify, Response, session
-import openai
 import os
 import re
 import json
@@ -10,10 +9,12 @@ from typing import Dict, List, Tuple, Optional
 import bleach
 import logging
 from pathlib import Path
+import subprocess  # Import the subprocess module
+from urllib.parse import urljoin  # added import
 
 # --- Constants and Configuration ---
 PROJECT_NAME = "sci-fi"
-VERSION = "1.0.3"  # Updated version
+VERSION = "1.0.3"
 DEFAULT_COMMIT_MESSAGE = "chore: No changes (API error)"
 SLEEP_DURATION = 5
 
@@ -24,12 +25,12 @@ OPENROUTER_API_KEY: str = os.getenv("OPENROUTER_API_KEY")
 if not OPENROUTER_API_KEY:
     raise ValueError("OPENROUTER_API_KEY environment variable not set.")
 
-MODEL_NAME: str = os.getenv("MODEL_NAME", "google/gemini-2.0-pro-exp-02-05:free")
+MODEL_NAME: str = os.getenv("MODEL_NAME", "qwen2.5-coder-3b-instruct-mlx")
 MAX_TOKENS: int = int(os.getenv("MAX_TOKENS", 2048))
 TEMPERATURE: float = float(os.getenv("TEMPERATURE", 0.2))
 CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE", 500))
 CONTEXT_WINDOW: int = int(os.getenv("CONTEXT_WINDOW", 10))
-BASE_URL: str = os.getenv("BASE_URL", "https://openrouter.ai/api/v1")
+BASE_URL: str = os.getenv("BASE_URL", "http://localhost:1234")
 PROJECT_URL: str = os.getenv("PROJECT_URL", "https://github.com/fabriziosalmi/sci-fi")
 MAX_RETRIES: int = 3
 IMPROVEMENTS_DIR: str = "improvements"
@@ -58,7 +59,6 @@ class DebugLogger:
             formatted_message = f"{timestamp} - {level}: {message}"
             self.logs.append(formatted_message)
             return f"data: {formatted_message}\n\n"  # SSE format
-        return ""
 
     def write(self, message: str) -> str:
         """Logs a message with INFO level."""
@@ -116,15 +116,69 @@ def load_prompts(filepath: str = "prompts.json") -> Dict[str, str]:
 
 prompts: Dict[str, str] = load_prompts()
 
-def get_openai_client() -> openai.OpenAI:
-    """Initializes and returns the OpenAI client."""
-    print(logger.info("Initializing OpenAI client..."))
-    client = openai.OpenAI(api_key=OPENROUTER_API_KEY, base_url=BASE_URL)
-    print(logger.info("OpenAI client initialized."))
-    return client
+
+def run_curl_command(prompt: str, api_key: str, base_url: str, model_name: str, max_tokens: int, temperature: float) -> str:
+    """
+    Executes a curl command to interact with the OpenAI-compatible API.
+    Returns the extracted content from the response, or an error message.
+    """
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+
+    data = {
+        "model": model_name,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+    }
+
+    # Combine BASE_URL with endpoint using urljoin
+    full_url = urljoin(base_url.rstrip('/') + '/', "chat/completions")
+
+    command = [
+        "curl",
+        "-X", "POST",
+        "-H", f"Authorization: Bearer {api_key}",
+        "-H", "Content-Type: application/json",
+        "-d", json.dumps(data),
+        full_url,
+    ]
+
+    print(logger.info(f"Executing curl command: {' '.join(command)}"))
+
+    try:
+        result = subprocess.run(command, capture_output=True, text=True, check=True)
+        print(logger.debug(f"Curl output: {result.stdout}")) # Log the full output
+        response_json = json.loads(result.stdout)
+
+        # Check for API errors in the response
+        if "error" in response_json:
+            error_message = response_json['error'].get('message', 'Unknown API error')
+            print (logger.error(f"API Error: {error_message}"))
+            return f"API Error: {error_message}"
+
+
+        return response_json["choices"][0]["message"]["content"].strip()
+
+    except subprocess.CalledProcessError as e:
+        print(logger.error(f"Curl command failed: {e}"))
+        print(logger.error(f"Stderr: {e.stderr}"))  # Print stderr for more details
+        return f"Curl command failed: {e.stderr}"
+    except json.JSONDecodeError as e:
+        print(logger.error(f"Failed to decode JSON response: {e}"))
+        print(logger.error(f"Response text: {result.stdout}")) #raw response
+        return f"Failed to decode JSON response: {e}"
+    except (KeyError, IndexError) as e:
+        print (logger.error(f"Unexpected response structure: {e}"))
+        return f"Unexpected response structure: {e}"
+    except Exception as e:
+        print(logger.error(f"An unexpected error occurred: {e}"))
+        return f"An unexpected error occurred: {e}"
+
 
 def improve_code_chunk(
-    client: openai.OpenAI,
     code_chunk: str,
     language: str,
     chunk_number: int,
@@ -132,7 +186,7 @@ def improve_code_chunk(
     truncation_info: str = "",
     retry: int = 0,
 ) -> str:
-    """Improves a single chunk of code using the OpenAI API, with retries and default value on empty response."""
+    """Improves a single chunk of code using curl, with retries."""
     prompt = prompts["improve_code"].format(
         language=language,
         chunk_number=chunk_number,
@@ -141,101 +195,55 @@ def improve_code_chunk(
         code_chunk=code_chunk,
     )
     print(logger.info(f"Improving chunk {chunk_number} of {total_chunks} (attempt {retry + 1})..."))
+
     try:
-        response = client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model=MODEL_NAME,
-            max_tokens=MAX_TOKENS,
-            temperature=TEMPERATURE,
-        )
-        if not response.choices:
-            raise ValueError(f"Empty response from OpenAI on attempt {retry + 1}.")  # More informative error
-        return response.choices[0].message.content.strip()
-
-    except ValueError as e:  # Catch the empty response error
-        print(logger.error(str(e)))
-        if retry < MAX_RETRIES:
-            time.sleep(SLEEP_DURATION)
-            return improve_code_chunk(
-                client,
-                code_chunk,
-                language,
-                chunk_number,
-                total_chunks,
-                truncation_info,
-                retry + 1,
-            )
-        else:
-            print(logger.warning(f"Returning original code chunk after {MAX_RETRIES} retries."))
-            return code_chunk  # Return original code after max retries
-
-    except openai.RateLimitError as e:
-        print(logger.error(f"Rate limit exceeded: {e}"))
-        if retry < MAX_RETRIES:
-            time.sleep(SLEEP_DURATION)
-            return improve_code_chunk(
-                client,
-                code_chunk,
-                language,
-                chunk_number,
-                total_chunks,
-                truncation_info,
-                retry + 1,
-            )
-        else:
-            raise
-
-    except openai.APIError as e:
-        print(logger.error(f"OpenAI API Error: {e}"))
-        raise
+        response_content = run_curl_command(prompt, OPENROUTER_API_KEY, BASE_URL, MODEL_NAME, MAX_TOKENS, TEMPERATURE)
+        if "API Error" in response_content or "Curl command failed" in response_content or "Failed to decode JSON" in response_content:
+            if retry < MAX_RETRIES:
+                time.sleep(SLEEP_DURATION)
+                print (logger.info("Retrying..."))
+                return improve_code_chunk(code_chunk, language, chunk_number, total_chunks, truncation_info, retry + 1)
+            else:
+                print (logger.warning("Max retries reached. Returning original code chunk."))
+                return code_chunk #return original
+        return response_content
 
     except Exception as e:
         print(logger.error(f"Unexpected error in improve_code_chunk: {e}"))
-        raise
+        if retry < MAX_RETRIES:
+           time.sleep(SLEEP_DURATION)
+           return improve_code_chunk(code_chunk, language, chunk_number, total_chunks, truncation_info, retry+1)
+
+        return code_chunk
 
 
-def generate_commit_message(
-    client: openai.OpenAI, improved_code: str, language: str, retry: int = 0
-) -> str:
-    """Generates a commit message, with retries and a default message on failure."""
+def generate_commit_message(improved_code: str, language: str, retry: int = 0) -> str:
+    """Generates a commit message using curl, with retries."""
     prompt = prompts["commit_message"].format(
         language=language, improved_code=improved_code
     )
     print(logger.info(f"Generating commit message (attempt {retry + 1})..."))
+
     try:
-        response = client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model=MODEL_NAME,
-            temperature=TEMPERATURE,
-        )
-        if not response.choices:
-            raise ValueError(f"Empty response from OpenAI on attempt {retry + 1}.")
-        return response.choices[0].message.content.strip()
-
-    except ValueError as e:  # Catch empty response
-        print(logger.error(str(e)))
-        if retry < MAX_RETRIES:
-            time.sleep(SLEEP_DURATION)
-            return generate_commit_message(client, improved_code, language, retry + 1)
-        else:
-            print(logger.warning(f"Returning default commit message after {MAX_RETRIES} retries."))
-            return DEFAULT_COMMIT_MESSAGE  # Return default message
-
-    except openai.RateLimitError as e:
-        print(logger.error(f"Rate limit exceeded: {e}"))
-        if retry < MAX_RETRIES:
-            time.sleep(SLEEP_DURATION)
-            return generate_commit_message(client, improved_code, language, retry + 1)
-        else:
-            raise
-
-    except openai.APIError as e:
-        print(logger.error(f"OpenAI API Error: {e}"))
-        raise
+        response_content = run_curl_command(prompt, OPENROUTER_API_KEY, BASE_URL, MODEL_NAME, MAX_TOKENS, TEMPERATURE)
+        if "API Error" in response_content or "Curl command failed" in response_content or "Failed to decode JSON" in response_content:
+          if retry < MAX_RETRIES:
+              time.sleep(SLEEP_DURATION)
+              print(logger.info("retrying..."))
+              return generate_commit_message(improved_code, language, retry + 1)
+          else:
+              print(logger.warning("Max retries reached. Returning default commit message"))
+              return DEFAULT_COMMIT_MESSAGE
+        return response_content
 
     except Exception as e:
         print(logger.error(f"Error generating commit message: {e}"))
-        raise
+        if retry < MAX_RETRIES:
+           time.sleep(SLEEP_DURATION)
+           return generate_commit_message(improved_code, language, retry + 1)
+
+        return DEFAULT_COMMIT_MESSAGE
+
 
 
 def chunk_code(code: str, max_lines: int = CHUNK_SIZE) -> List[Tuple[str, str]]:
@@ -273,12 +281,12 @@ def _generate_truncation_message(chunk: List[str], trunc_point: int) -> str:
     return ""
 
 def process_code(code: str, language: str) -> Tuple[str, str, str]:
-    """Processes the code, improves it, and generates a commit message, handling API errors."""
+    """Processes the code, improves it, and generates a commit message."""
     if not code or not language:
         return "", "", "Please enter code and select a language."
 
     try:
-        client = get_openai_client()
+        # No more client = get_openai_client()
         chunks = chunk_code(code)
         total_chunks = len(chunks)
         improved_code = ""
@@ -287,7 +295,7 @@ def process_code(code: str, language: str) -> Tuple[str, str, str]:
         for i, (chunk, marker) in enumerate(chunks):
             try:
                 improved_chunk = improve_code_chunk(
-                    client, chunk, language, i + 1, total_chunks, truncation_info
+                     chunk, language, i + 1, total_chunks, truncation_info
                 )
                 if i < total_chunks - 1:
                     if re.search(r"^(def|class)\s+", improved_chunk, re.MULTILINE):
@@ -301,7 +309,7 @@ def process_code(code: str, language: str) -> Tuple[str, str, str]:
                 return "", "", str(e)  # Catch any errors during chunk improvement
 
         try:
-            commit_message = generate_commit_message(client, improved_code, language)
+            commit_message = generate_commit_message(improved_code, language)
         except Exception as e:
              return improved_code, DEFAULT_COMMIT_MESSAGE, str(e)
 
@@ -447,6 +455,14 @@ def stream() -> Response:
     return Response(generate(), mimetype="text/event-stream")
 
 if __name__ == "__main__":
-    print(f"Current working directory: {os.getcwd()}")
-    print(f"Contents of current directory: {os.listdir()}")
+    if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Contents of current directory: {os.listdir()}")
+        # New prints for API endpoint, model and options
+        print("API Endpoint:", BASE_URL)
+        print("Model:", MODEL_NAME)
+        print("Temperature:", TEMPERATURE)
+        print("Max Tokens:", MAX_TOKENS)
+        print("Chunk Size:", CHUNK_SIZE)
+        print("Context Window:", CONTEXT_WINDOW)
     app.run(debug=True, host="0.0.0.0", port=7860)
