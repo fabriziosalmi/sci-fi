@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Sci-Fi Code Improver Flask Application
-Version: 1.1.4 (Refined error handling, regex, retry logic, removed unused config)
+Version: 1.1.5 (Some UI fixes and changes)
 
 Improves code snippets using an LLM API, generates commit messages,
 and provides a web interface.

@@ -390,15 +390,25 @@ footer {
 
 /* New loading bar style */
 .loading-bar {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;  /* Ensure padding/borders are included in width */
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 50%, var(--primary) 100%);
-    background-size: 200% 100%;
-    animation: loadingAnimation 1.5s infinite;
-    margin-top: 10px;
+  text-align: center;
+  width: 100% auto;
+  max-height: 30px;
+  aspect-ratio: 1;
+  --_g: no-repeat radial-gradient(circle closest-side,#FFF 90%,#0000);
+  background: 
+    var(--_g) 0%   50%,
+    var(--_g) 50%  50%,
+    var(--_g) 100% 50%;
+  background-size: calc(100%/3) 100%;
+  animation: l7 1s infinite linear;
+  border: none;
 }
+@keyframes l7 {
+    33%{background-size:calc(100%/3) 0%  ,calc(100%/3) 100%,calc(100%/3) 100%}
+    50%{background-size:calc(100%/3) 100%,calc(100%/3) 0%  ,calc(100%/3) 100%}
+    66%{background-size:calc(100%/3) 100%,calc(100%/3) 100%,calc(100%/3) 0%  }
+}
+
 
 /* Loading bar animation */
 @keyframes loadingAnimation {
@@ -455,4 +465,23 @@ button.primary-btn {
 #commit-message {
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+#processIndicator {
+  background-color: #0d0d0d00;
+  border: 0px solid var(--border-color);
+  border-radius: 30px;
+  margin: 0 auto;
+}
+
+.pre2 {
+  border: 0px solid #0000;
+  box-shadow: 0 0px 0px rgba(255, 255, 255, 0);
+}
+
+
+button.primary-btn {
+  background-color: #1fa80b;
+  color: #fff;
+  border: 4px solid #000;
 }
