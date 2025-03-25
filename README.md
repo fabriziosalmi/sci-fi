@@ -1,4 +1,4 @@
-# Sci-Fi Code Improver
+# Simple Code Improver - Framework & Interface
 
 ## Overview
 Sci-Fi Code Improver is a web application that enhances your programming code by analyzing and improving it for security, performance, maintainability, and adherence to coding best practices. It also generates commit messages following the Conventional Commits format.
