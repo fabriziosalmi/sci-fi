@@ -7,11 +7,16 @@
     <title>Code Improver</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <!-- Highlight.js CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <!--  Favicon (optional, but good practice) -->
     <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <!-- Add Font Awesome CDN for icons -->
+    <!-- Font Awesome CDN for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add Marked.js for Markdown (used for commit message) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Include Highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
 </head>
 <body class="light-theme">
     <header>
@@ -19,46 +24,38 @@
         <button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark/light mode"><i class="fas fa-moon"></i></button>  <!-- Icon for theme toggle -->
     </header>
 
-    <main class="container">  <!-- Added container class here -->
+    <main class="container">
         <section class="input-section">
-            <h2><i class="fas fa-code"></i> Original Code</h2> <!-- Icon for clarity -->
-            <!-- Code text area row remains unchanged -->
+            <h2><i class="fas fa-code"></i> Original Code</h2>
             <div class="submission-row">
                 <div class="code-area">
                     <textarea id="code" rows="10" placeholder="Paste your code here..." aria-label="Code input"></textarea>
                 </div>
             </div>
-            <!-- New row for language select and improve button -->
             <div class="action-row">
-                <!-- Modified: Button now displays only the magic icon -->
                 <button class="primary-btn" onclick="improveCode()" aria-label="Improve Code">
-                    <i class="fas fa-magic"></i>
+                    <i class="fas fa-magic"></i> Improve
                 </button>
-                <!-- Modified: Button now displays only the eraser icon -->
                 <button class="primary-btn" onclick="clearSession()" aria-label="Clear Session">
-                    <i class="fas fa-eraser"></i>
+                    <i class="fas fa-eraser"></i> Clear
                 </button>
             </div>
             <div id="processIndicator" class="loading-bar" style="display: none;"></div>
         </section>
-        <!-- Modified: Hide output section initially -->
+
         <section class="output-section" aria-live="polite" style="display: none;">
-            <h2><i class="fas fa-check-circle"></i> Improved Code</h2> <!-- Icon and more descriptive title -->
+            <h2><i class="fas fa-check-circle"></i> Improved Code</h2>
             <div class="code-container">
-                <pre><code id="improved-code" class="language-python">
-                    <!-- Improved code will appear here -->
-                </code></pre>
+                <pre><code id="improved-code" class="language-python"></code></pre>
             </div>
             <div class="actions-container">
                 <button class="icon-btn" onclick="copyImprovedCode()" aria-label="Copy Improved Code" title="Copy"><i class="fas fa-copy"></i></button>
                 <button class="icon-btn" onclick="downloadImprovedCode()" aria-label="Download Improved Code" title="Download"><i class="fas fa-download"></i></button>
             </div>
 
-            <h2><i class="fas fa-comment"></i> Commit Message</h2> <!-- Icon and more descriptive title -->
+            <h2><i class="fas fa-comment"></i> Commit Message</h2>
             <div class="commit-container">
-                <div id="commit-message">
-                <!-- Commit message will appear here -->
-            </div>
+                <div id="commit-message"></div>
             </div>
             <div class="actions-container">
                 <button class="icon-btn" onclick="copyCommitMessage()" aria-label="Copy Commit Message" title="Copy"><i class="fas fa-copy"></i></button>
@@ -71,155 +68,117 @@
             <svg aria-hidden="true" height="32" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true" style="fill: currentColor;">
                 <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"></path>
             </svg>
-        </a>      
-            
+        </a>
     </footer>
 
-    <!-- ... (Rest of your JavaScript and script includes) ... -->
    <script>
        const codeInput = document.getElementById('code');
-       // Removed languageSelect variable
        const improvedCodeOutput = document.getElementById('improved-code');
        const commitMessageOutput = document.getElementById('commit-message');
        const processIndicator = document.getElementById('processIndicator');
 
        function improveCode() {
-    const code = codeInput.value;
-    if (code.trim() === "") {
-        alert("Please enter some code before clicking Improve.");
-        return;
-    }
-    processIndicator.style.display = "block";
-    improvedCodeOutput.textContent = '';
-    commitMessageOutput.innerHTML = '';
-    document.querySelector('.output-section').style.display = "none";
-
-    let detectedLang = "python"; // default
-
-    // First auto-detect language
-    fetch("/detect_language", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code }),
-    })
-    .then(response => {
-        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-        return response.json();
-    })
-    .then(data => {
-        detectedLang = data.language; // save detected language
-        // Now improve the code using the detected language:
-        return fetch('/improve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code, language: detectedLang })
-        });
-    })
-    .then(response => {
-        if (!response.ok) { throw new Error(`HTTP error! status: ${response.status}`); }
-        return response.json();
-    })
-    .then(data => {
-        processIndicator.style.display = "none";
-        if (data.error) {
-            alert("Error: " + data.error);
-        } else {
-            const improved = data.improved_code.trim();
-            improvedCodeOutput.textContent = improved;
-            const commitMsg = data.commit_message ? data.commit_message.trim() : "";
-            commitMessageOutput.innerHTML = commitMsg ? marked.parse(commitMsg) : "";
-            // Use the persisted language for syntax highlighting
-            improvedCodeOutput.className = 'language-' + detectedLang;
-            hljs.highlightElement(improvedCodeOutput);
-            if (improved !== "") {
-                document.querySelector('.output-section').style.display = "block";
-            } else {
-                document.querySelector('.output-section').style.display = "none";
+            const code = codeInput.value;
+            if (!code.trim()) {
+                alert("Please enter some code before clicking Improve.");
+                return;
             }
+
+            processIndicator.style.display = "block";
+            improvedCodeOutput.textContent = '';
+            commitMessageOutput.innerHTML = '';
+            document.querySelector('.output-section').style.display = "none";
+
+            let detectedLang = "python"; // Default language
+
+            fetch("/detect_language", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ code }),
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                detectedLang = data.language;
+                return fetch('/improve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, language: detectedLang })
+                });
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                processIndicator.style.display = "none";
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    const improved = data.improved_code.trim();
+                    improvedCodeOutput.textContent = improved;
+                    const commitMsg = data.commit_message ? data.commit_message.trim() : "";
+                    commitMessageOutput.innerHTML = commitMsg ? marked.parse(commitMsg) : ""; // Parse Markdown
+                    improvedCodeOutput.className = 'language-' + detectedLang;  // Set for highlighting
+                    hljs.highlightElement(improvedCodeOutput); // Apply highlighting
+                    if (improved) {  // Check for empty string
+                        document.querySelector('.output-section').style.display = "block";
+                    }
+                }
+            })
+            .catch(error => {
+                processIndicator.style.display = "none";
+                console.error("Fetch error:", error);
+                alert("An error occurred. See console for details.");
+            });
         }
-    })
-    .catch(error => {
-        processIndicator.style.display = "none";
-        console.error("Fetch error:", error);
-        alert("An error occurred. See console for details.");
-    });
-}
 
        function toggleTheme() {
            const body = document.body;
            body.classList.toggle('dark-theme');
-           // Store preference
            const isDarkMode = body.classList.contains('dark-theme');
            localStorage.setItem('darkMode', isDarkMode);
-           updateThemeIcon(); // Update the icon to match the theme
+           updateThemeIcon();
        }
 
-       // Load theme preference on page load
        document.addEventListener('DOMContentLoaded', () => {
            const isDarkMode = localStorage.getItem('darkMode') === 'true';
            if (isDarkMode) {
                document.body.classList.add('dark-theme');
            }
-           updateThemeIcon(); // Initialize the icon correctly
+           updateThemeIcon();
        });
 
        function updateThemeIcon() {
            const themeToggleIcon = document.querySelector('#themeToggle i');
-           if (document.body.classList.contains('dark-theme')) {
-               themeToggleIcon.classList.remove('fa-moon');
-               themeToggleIcon.classList.add('fa-sun');  // Sun icon for dark mode
-           } else {
-               themeToggleIcon.classList.remove('fa-sun');
-               themeToggleIcon.classList.add('fa-moon');  // Moon icon for light mode
-           }
+           themeToggleIcon.classList.toggle('fa-moon', !document.body.classList.contains('dark-theme'));
+           themeToggleIcon.classList.toggle('fa-sun', document.body.classList.contains('dark-theme'));
        }
+
+        function copyTextToClipboard(text, successMessage) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => alert(successMessage))
+                    .catch(err => {
+                        console.error("Failed to copy: ", err);
+                        fallbackCopy(text);
+                    });
+            } else {
+                fallbackCopy(text);
+            }
+        }
 
        function copyImprovedCode() {
-           const code = improvedCodeOutput.textContent;
-           if (navigator.clipboard && navigator.clipboard.writeText) {
-               navigator.clipboard.writeText(code)
-                   .then(() => alert("Code copied to clipboard!"))
-                   .catch(err => {
-                       console.error("Failed to copy: ", err);
-                       fallbackCopy(code);
-                   });
-           } else {
-               fallbackCopy(code);
-           }
+            copyTextToClipboard(improvedCodeOutput.textContent, "Code copied to clipboard!");
        }
+        function copyCommitMessage() {
+           copyTextToClipboard(commitMessageOutput.innerText, "Commit message copied to clipboard!");
+        }
+
 
        function fallbackCopy(text) {
-           const textArea = document.createElement("textarea");
-           textArea.value = text;
-           document.body.appendChild(textArea);
-           textArea.focus(); // Focus for iOS Safari
-           textArea.select();
-           try {
-               const successful = document.execCommand("copy");
-               const msg = successful ? "Code copied to clipboard!" : "Failed to copy code.";
-               alert(msg);
-           } catch (err) {
-               console.error("Failed to copy: ", err);
-               alert("Failed to copy code.");
-           }
-           document.body.removeChild(textArea);
-       }
-
-       function copyCommitMessage() {
-           const message = commitMessageOutput.innerText;
-           if (navigator.clipboard && navigator.clipboard.writeText) {
-               navigator.clipboard.writeText(message)
-                   .then(() => alert("Commit message copied to clipboard!"))
-                   .catch(err => {
-                       console.error("Failed to copy commit message: ", err);
-                       fallbackCopyCommit(message);
-                   });
-           } else {
-               fallbackCopyCommit(message);
-           }
-       }
-
-       function fallbackCopyCommit(text) {
            const textArea = document.createElement("textarea");
            textArea.value = text;
            document.body.appendChild(textArea);
@@ -227,11 +186,11 @@
            textArea.select();
            try {
                const successful = document.execCommand("copy");
-               const msg = successful ? "Commit message copied to clipboard!" : "Failed to copy commit message.";
+               const msg = successful ? "Copied to clipboard!" : "Failed to copy.";
                alert(msg);
            } catch (err) {
-               console.error("Failed to copy commit message: ", err);
-               alert("Failed to copy commit message.");
+               console.error("Failed to copy: ", err);
+               alert("Failed to copy.");
            }
            document.body.removeChild(textArea);
        }
@@ -243,32 +202,19 @@
            const a = document.createElement('a');
            a.href = url;
            a.download = "improved_code.txt";
-           a.style.display = 'none'; // Hide the link
-           document.body.appendChild(a); // Append to body for Firefox
+           a.style.display = 'none';
+           document.body.appendChild(a);
            a.click();
-           document.body.removeChild(a); // Clean up
+           document.body.removeChild(a);
            URL.revokeObjectURL(url);
        }
 
        function clearSession() {
-           fetch('/clear_session', {
-               method: 'POST'
-           })
+           fetch('/clear_session', { method: 'POST' })
            .then(response => response.json())
-           .then(data => {
-               alert(data.status);
-           })
-           .catch(error => {
-               console.error("Clear session failed:", error);
-               alert("Failed to clear session!");
-           });
+           .then(data => alert(data.status))
+           .catch(error => { console.error("Clear session failed:", error); alert("Failed to clear session!"); });
        }
-
    </script>
-
-    <!-- Include Marked.js for Markdown parsing -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <!-- Include Highlight.js lib -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 </body>
 </html>
