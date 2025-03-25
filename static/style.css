@@ -1,0 +1,416 @@
+/* style.css */
+:root {
+  /* Light theme variables */
+  --background: #f5f7fa; /* Lighter gray background */
+  --text-color: #333;
+  --primary: #1e88e5; /* Blue, but less saturated */
+  --primary-hover: #1a73c7; /* Darker blue on hover */
+  --input-bg: #fff;
+  --border-color: #d1d5da; /* Slightly darker border */
+  --rounded: 8px; /* More rounded corners */
+  --code-bg: #f6f8fa; /* Light code background */
+  --shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
+  --heading-font: 'Helvetica Neue', Arial, sans-serif; /* Different font for headings */
+}
+
+.dark-theme {
+  /* Dark theme overrides */
+  --background: #121212; /* Darker background */
+  --text-color: #e0e0e0;
+  --primary: #42a5f5; /* Brighter blue for contrast */
+  --primary-hover: #64b5f6;
+  --input-bg: #242424; /* Darker input background */
+  --border-color: #444; /* Darker border */
+  --code-bg: #1b1b1b; /* Darker code background */
+  --shadow: 0 3px 6px rgba(255, 255, 255, 0.05); /* Subtle bright shadow */
+   --border-color: #464646;
+  --code-bg: #0d0d0d; /* Darker code background */
+
+}
+
+/* Global styling */
+body {
+  background-color: var(--background);
+  color: var(--text-color);
+  font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* More modern font stack */
+  margin: 0;
+  padding: 0; /* Reset all padding */
+  transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.6; /* Improved readability */
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0.5rem 0;
+  line-height: 1.2; /* Tighter line height for headings */
+  font-family: var(--heading-font); /* Apply heading font */
+}
+
+h1 { font-size: 2.5rem; } /* Larger main heading */
+h2 { font-size: 1.75rem; margin-bottom: 1rem; } /* Larger subheadings */
+
+/* Form elements and buttons */
+textarea, input, select, button {
+  border: 1px solid var(--border-color);
+  border-radius: var(--rounded);
+  padding: 0.75rem; /* Increased padding */
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  font-family: inherit;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.2s ease; /* Smoother transitions */
+  box-shadow: var(--shadow); /* Added subtle shadow */
+  outline: none; /* Remove default outline */
+  font-size: small; /* Consistent font size */
+}
+
+/* Focus styles for better accessibility */
+textarea:focus, input:focus, select:focus, button:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.3); /* More pronounced focus ring */
+}
+
+/* Responsive textarea */
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical; /* Allow only vertical resizing */
+}
+
+/* Primary button style (for "Improve Code") */
+button.primary-btn {
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 0.8rem 1.5rem;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button.primary-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Select element improvement */
+select {
+  appearance: none;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333'%3E%3Cpath d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z'/%3E%3C/svg%3E"); /* Custom dropdown arrow */
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1.2em;
+}
+.dark-theme select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Cpath d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z'/%3E%3C/svg%3E");
+}
+
+/* Code output styling */
+pre {
+  background-color: var(--code-bg);
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--rounded);
+  overflow: auto;
+  box-shadow: var(--shadow);
+}
+
+/* New common styling for icon buttons */
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 1.2rem; /* Increased size slightly */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+    padding: 0.4rem; /* Add some padding */
+    width: 30px;    /* Consistent width */
+    height: 30px;   /* Consistent height */
+}
+
+.icon-btn:hover {
+    color: var(--primary);
+}
+
+/* Commit message styling to match improved code section */
+#commit-message {
+    /* Removed conflicting styles */
+    background-color: transparent; /* Use container's background */
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 0;
+}
+
+
+/* New container styling */
+.container {
+  max-width: 960px; /* Increased max-width */
+  margin: 0 auto;
+  padding: 2rem 1rem; /* Increased top/bottom padding */
+}
+
+/* Input/Output sections */
+.input-section, .output-section {
+  margin-bottom: 2rem;
+}
+
+/* Button group styling  -- DELETED, no longer needed */
+
+
+/* Code container improvements */
+.code-container {
+  position: relative;
+}
+
+/* Position actions in the code container */
+.code-actions {
+    position: absolute;
+    top: 0.5rem;        /* Align with top of code block */
+    right: 0.5rem;      /* Align with right of code block */
+    display: flex;       /* Use flex for easier alignment */
+    gap: 0.25rem;     /* Space out the buttons slightly */
+}
+
+/* Improved spacing and alignment */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* .button-group { -- DELETED
+  margin-top: 1rem;
+} */
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .code-actions {
+      position: static; /* Stack buttons on smaller screens */
+      margin-top: 0.5rem;
+      text-align: center; /* Center the buttons */
+      width: 100%; /* Make sure they occupy full width */
+  }
+  .code-actions button {
+      margin: 0.25rem; /* Smaller margins */
+      /* padding is already handled by .icon-btn */
+  }
+  .container {
+      padding: 1rem 0.5rem;  /*Less padding on sides */
+  }
+    .action-row {
+      flex-direction: column; /* Stack on smaller screens */
+  }
+  .action-row select, .action-row button {
+      width: 100%; /* Full width on smaller screens */
+  }
+}
+
+/* Extra media query for very small devices */
+@media (max-width: 480px) {
+  .container {
+    padding: 1rem 0.5rem; /* Even less side padding */
+  }
+  textarea, input, select, button {
+    font-size: 0.9rem; /* Slightly smaller fonts */
+  }
+}
+
+/* Styling for dark/light toggle button */
+#themeToggle {
+  padding: 0.5rem;
+  font-size: 1.5rem; /* Larger icon */
+  background-color: transparent; /* No background */
+  color: var(--text-color);  /* Use text color so it changes */
+  border: none;
+  border-radius: var(--rounded);
+  cursor: pointer;
+  transition:  filter 0.3s ease;
+}
+#themeToggle:hover {
+  filter: brightness(1.5); /* Brighter on hover */
+}
+
+/* Additional UI improvements */
+/* Header improvements */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: var(--background);
+  box-shadow: var(--shadow);
+}
+
+/* Main layout */
+main {
+  padding: 1rem;
+}
+/* Footer styling (if needed) */
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+/* New style for process indicator */
+#processIndicator {
+    background-color: var(--code-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--rounded);
+    box-shadow: var(--shadow);
+    padding: 1rem;
+    font-size: 1rem;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* New style for action row combining language select and improve button */
+.action-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center; /* Vertically center items */
+}
+
+.action-row select {
+  flex: 1;
+}
+
+.action-row button {
+  flex: 3;
+}
+
+
+.hljs {
+    background: #0d0d0d;
+    color: #fff;
+}
+
+/* Commit Message Specific Improvements */
+.output-section h2 {  /* Target the h2 within the output section */
+  color: var(--primary);
+  font-size: 1.9rem; /* Slightly smaller than other section headings */
+  margin-bottom: 0.8rem;
+  display: flex;        /* Make the heading a flex container */
+  align-items: center;  /* Vertically center the icon and text */
+  gap: 0.6rem;        /* Add some space between the icon and text */
+}
+
+.commit-container {
+  position: relative; /* Needed for absolute positioning of the button */
+  background-color: var(--code-bg);
+  padding: 1.5rem; /* More padding inside the container */
+  border: 1px solid var(--border-color);
+  border-radius: var(--rounded);
+  box-shadow: var(--shadow);
+  overflow: auto;
+  margin-bottom: 1rem;
+}
+
+
+.commit-container .icon-btn {  /* Style the copy button within commit-container */
+    position: absolute;
+    top: 0.5rem; /* Align with container top */
+    right: 0.5rem; /* Align with container right */
+    /* padding, width, height are inherited from .icon-btn */
+}
+
+
+#commit-message ul { /* Style the unordered list */
+  list-style: none; /* Remove default bullets */
+  padding-left: 1rem; /* Indent the list */
+}
+
+#commit-message li {
+  margin-bottom: 0.5rem; /* Spacing between list items */
+  position: relative; /* For positioning the custom bullet */
+  padding-left: 1.5rem;
+}
+#commit-message li::before {
+  content: ''; /* Create a pseudo-element for the bullet */
+  position: absolute;
+  top: 0.5rem;  /* was .6rem */
+  left: 0;
+  width: 0.4rem; /* Smaller bullet size */
+  height: 0.4rem;
+  border-radius: 50%; /* Make it a circle */
+  background-color: var(--primary); /* Use the primary color */
+}
+
+/* Ensure that the commit-message div doesn't cause overflow */
+#commit-message > *:last-child {
+ margin-bottom: 0 !important;
+}
+
+/* Better Responsiveness for Commit Message */
+@media (max-width: 768px) {
+  .commit-container .icon-btn {  /* Adjust button positioning */
+      top: 0.25rem;
+      right: 0.25rem;
+  }
+
+  .commit-container {
+    padding: 0.75rem;  /* Less padding on smaller screens */
+  }
+}
+
+.code-area {
+    position: relative; /* Make sure this is set */
+}
+
+.code-actions {
+  top: 1.7rem;
+  right: 1.7rem;
+}
+
+pre {
+  min-height: 3rem;
+}
+
+.commit-container .icon-btn {
+  right: 1.5rem;
+}
+
+footer {
+  margin-top: 1rem;
+}
+
+/* New common styling container for action buttons placed below sections */
+.actions-container {
+    text-align: right;
+    margin-top: 0.5rem;
+}
+
+/* New loading bar style */
+.loading-bar {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;  /* Ensure padding/borders are included in width */
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-hover) 50%, var(--primary) 100%);
+    background-size: 200% 100%;
+    animation: loadingAnimation 1.5s infinite;
+    margin-top: 10px;
+}
+
+/* Loading bar animation */
+@keyframes loadingAnimation {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+footer {
+  padding-top: 0rem;
+  padding-bottom: 2rem;
+  margin-top: 0.2rem;
+}

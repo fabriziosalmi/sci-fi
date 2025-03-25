@@ -1,0 +1,6 @@
+nicegui==0.9.0
+openai==0.11.0
+python-dotenv==0.20.0
+
+
+# google/gemini-2.0-pro-exp-02-05:free
