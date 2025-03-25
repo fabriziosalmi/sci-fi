@@ -32,7 +32,9 @@
 body {
   background-color: var(--background);
   color: var(--text-color);
-  font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* More modern font stack */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  sans-serif;
   margin: 0;
   padding: 0; /* Reset all padding */
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -444,4 +446,8 @@ a {
     align-items: center;
     gap: 1rem;
     padding: 1rem 0;
+}
+
+button.primary-btn {
+  font-size: large;
 }
