@@ -10,6 +10,11 @@ Sci-Fi Code Improver is a web application that enhances your programming code by
 - **Theme Toggle:** Switch between light and dark themes.
 - **Session Management:** Version history maintained in user sessions.
 - **Auto Language Detection:** Determines the coding language from the input.
+- **FreeTekno addons:** Background tripping video and [Free Undeground Tekno Radio](https://radio.free-tekno.com) music 🌀
+
+## Screenshot
+
+![screenshot](https://github.com/fabriziosalmi/sci-fi/blob/main/static/sci-fi_screenshot.png?raw=true)
 
 ## Installation
 1. **Clone the repository:**
