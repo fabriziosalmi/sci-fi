@@ -24,10 +24,15 @@ Sci-Fi Code Improver is a web application that enhances your programming code by
    pip install -r requirements.txt
    ```
 3. **Configure Environment Variables:**
-   Create a `.env` file in the project root with at least:
-   ```
-   OPENROUTER_API_KEY=your_api_key_here
-   SECRET_KEY=your_secret_key_here
+   Create a `.env` file in the project root like this:
+   ```ini
+   OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxx
+   MODEL_NAME=google/gemini-2.0-pro-exp-02-05:free
+   MAX_TOKENS=2048
+   TEMPERATURE=0.2
+   CHUNK_SIZE=500
+   CONTEXT_WINDOW=10
+   BASE_URL=https://openrouter.ai/api/v1
    ```
 
 ## Usage
