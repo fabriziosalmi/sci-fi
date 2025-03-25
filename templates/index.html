@@ -20,9 +20,9 @@
 </head>
 <body class="light-theme">
     <video class="bg-video" autoplay loop muted playsinline src="{{ url_for('static', filename='bg.mp4') }}"></video>
-    <header>
+    <!-- <header>
         <h1 style="text-align: center;">Code <span style="color: var(--primary);">Improver</span></h1>
-    </header>
+    </header> -->
 
     <main class="container">
         <section class="input-section">
@@ -64,6 +64,10 @@
     </main>
 
     <footer class="footer-icons">
+        <!-- Added radio toggle button -->
+        <button id="radioToggle" onclick="toggleRadio()" aria-label="Toggle Radio" title="Toggle Radio">
+            <i class="fas fa-stop"></i>
+        </button>
         <button id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark/light mode">
             <i class="fas fa-moon"></i>
         </button>
@@ -73,6 +77,8 @@
             </svg>
         </a>
     </footer>
+    <!-- Added hidden audio element for web radio -->
+    <audio id="webRadio" src="https://radio.freeundergroundtekno.org/listen/free_underground_tekno/radio.mp3" autoplay style="display:none;"></audio>
 
    <script>
        const codeInput = document.getElementById('code');
@@ -218,6 +224,30 @@
            .then(data => alert(data.status))
            .catch(error => { console.error("Clear session failed:", error); alert("Failed to clear session!"); });
        }
+
+       // Added radio toggle functionality
+       function toggleRadio() {
+           const radio = document.getElementById('webRadio');
+           const radioToggle = document.getElementById('radioToggle');
+           if (radio.paused) {
+               radio.play();
+               radioToggle.innerHTML = '<i class="fas fa-stop"></i>';
+           } else {
+               radio.pause();
+               radioToggle.innerHTML = '<i class="fas fa-play"></i>';
+           }
+       }
+
+       document.addEventListener('DOMContentLoaded', () => {
+           // ...existing code...
+           const radio = document.getElementById('webRadio');
+           const radioToggle = document.getElementById('radioToggle');
+           if (radio.paused) {
+               radioToggle.innerHTML = '<i class="fas fa-play"></i>';
+           } else {
+               radioToggle.innerHTML = '<i class="fas fa-stop"></i>';
+           }
+       });
    </script>
 </body>
 </html>
