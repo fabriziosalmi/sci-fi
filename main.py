@@ -26,7 +26,7 @@ from dotenv import load_dotenv
 
 # --- Constants and Configuration ---
 PROJECT_NAME = "sci-fi"
-VERSION = "1.1.4"  # Incremented version
+VERSION = "1.1.6"  # Incremented version
 DEFAULT_COMMIT_MESSAGE = "chore: Code improved via LLM (API interaction issues)"
 SLEEP_DURATION = 5
 MAX_RETRIES = 3
@@ -603,7 +603,8 @@ def improve() -> Union[Response, Tuple[Response, int]]: # Return type hint corre
         "improved_code": improved_code,
         "commit_message": full_commit_message,
         "iteration": current_iteration,
-        "language": final_language # Return the language that was actually used
+        "language": final_language,
+        "improvement_log": improvement_data  # Add this line
     }), 200
 
 @app.route("/clear_session", methods=["POST"])

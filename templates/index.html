@@ -51,6 +51,10 @@
             <div class="actions-container">
                 <button class="icon-btn" onclick="copyImprovedCode()" aria-label="Copy Improved Code" title="Copy"><i class="fas fa-copy"></i></button>
                 <button class="icon-btn" onclick="downloadImprovedCode()" aria-label="Download Improved Code" title="Download"><i class="fas fa-download"></i></button>
+                <!-- New icon button for logs -->
+                <button class="icon-btn" onclick="showImprovementLog()" aria-label="Show Improvement Log" title="Show JSON Log">
+                    <i class="fas fa-file-alt"></i>
+                </button>
             </div>
 
             <h2><i class="fas fa-comment"></i> Commit Message</h2>
@@ -81,6 +85,9 @@
     <audio id="webRadio" src="https://radio.freeundergroundtekno.org/listen/free_underground_tekno/radio.mp3" autoplay style="display:none;"></audio>
 
    <script>
+       // New global variable to store improvement log
+       let improvementLogContent = null;
+       
        const codeInput = document.getElementById('code');
        const improvedCodeOutput = document.getElementById('improved-code');
        const commitMessageOutput = document.getElementById('commit-message');
@@ -123,6 +130,8 @@
             })
             .then(data => {
                 processIndicator.style.display = "none";
+                // Store the returned JSON improvement log
+                improvementLogContent = data.improvement_log;
                 if (data.error) {
                     alert("Error: " + data.error);
                 } else {
@@ -237,6 +246,39 @@
                radioToggle.innerHTML = '<i class="fas fa-play"></i>';
            }
        }
+
+       // New function to show the improvement log JSON
+        function showImprovementLog() {
+            if (improvementLogContent) {
+                const formattedLog = JSON.stringify(improvementLogContent, null, 2);
+                // Create a "pretty" view of the JSON for better readability
+                const logWindow = window.open('', 'Improvement Log', 'width=800,height=600');
+                logWindow.document.write(`
+                    <html>
+                    <head>
+                        <title>Improvement Log</title>
+                        <style>
+                            body { 
+                                background-color: #1e1e1e; 
+                                color: #d4d4d4; 
+                                font-family: monospace;
+                                padding: 20px;
+                            }
+                            pre {
+                                white-space: pre-wrap;
+                                word-wrap: break-word;
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        <pre>${formattedLog}</pre>
+                    </body>
+                    </html>
+                `);
+            } else {
+                alert("No improvement log available yet.");
+            }
+        }
 
        document.addEventListener('DOMContentLoaded', () => {
            // ...existing code...
