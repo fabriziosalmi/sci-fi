@@ -587,3 +587,13 @@ pre {
   border: 0px solid var(--border-color);
   box-shadow: none;
 }
+
+.codebox {
+  position: relative;
+  padding: 0.4em;
+  background-color: #202020;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 5px solid #fff;
+  animation: neon-border-glow 2s linear infinite;
+}
