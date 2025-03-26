@@ -485,3 +485,105 @@ button.primary-btn {
   color: #fff;
   border: 4px solid #000;
 }
+
+
+
+.codebox {
+  position: relative;
+  padding: 1.5em; /* Spazio tra il bordo e il codice */
+  background-color: #1e1e1e; /* Sfondo scuro per il codice */
+  border-radius: 20px; /* Angoli arrotondati */
+  overflow: hidden; /* Assicura che il glow non causi problemi */
+  border: 2px solid transparent; /* Crea spazio per il box-shadow */
+
+  /* Applica l'animazione chiamata 'neon-border-glow' */
+  animation: neon-border-glow 6s linear infinite;
+}
+
+/* Definisce l'animazione (questa parte rimane uguale) */
+@keyframes neon-border-glow {
+  0% {
+      /* Colore iniziale (es. Ciano) */
+      box-shadow: 0 0 5px rgba(0, 255, 255, 0.8),
+                  0 0 10px rgba(0, 255, 255, 0.6),
+                  0 0 15px rgba(0, 255, 255, 0.4),
+                  0 0 20px rgba(0, 255, 255, 0.3);
+  }
+  25% {
+      /* Colore intermedio (es. Magenta) */
+      box-shadow: 0 0 5px rgba(255, 0, 255, 0.8),
+                  0 0 10px rgba(255, 0, 255, 0.6),
+                  0 0 15px rgba(255, 0, 255, 0.4),
+                  0 0 20px rgba(255, 0, 255, 0.3);
+  }
+  50% {
+      /* Colore intermedio (es. Giallo) */
+      box-shadow: 0 0 5px rgba(255, 255, 0, 0.8),
+                  0 0 10px rgba(255, 255, 0, 0.6),
+                  0 0 15px rgba(255, 255, 0, 0.4),
+                  0 0 20px rgba(255, 255, 0, 0.3);
+  }
+  75% {
+      /* Colore intermedio (es. Verde Lime) */
+      box-shadow: 0 0 5px rgba(50, 205, 50, 0.8),
+                  0 0 10px rgba(50, 205, 50, 0.6),
+                  0 0 15px rgba(50, 205, 50, 0.4),
+                  0 0 20px rgba(50, 205, 50, 0.3);
+  }
+  100% {
+      /* Ritorna al colore iniziale per un loop fluido */
+      box-shadow: 0 0 5px rgba(0, 255, 255, 0.8),
+                  0 0 10px rgba(0, 255, 255, 0.6),
+                  0 0 15px rgba(0, 255, 255, 0.4),
+                  0 0 20px rgba(0, 255, 255, 0.3);
+  }
+}
+
+/* Stili base per il contenuto dentro .codebox */
+.codebox pre {
+  margin: 0; /* Rimuove margini predefiniti */
+  background-color: transparent !important; /* Assicura che lo sfondo di pre non copra quello del container */
+}
+
+.codebox code {
+  color: #d4d4d4; /* Colore testo codice (esempio) */
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+  /* Altri stili hljs verranno applicati qui */
+}
+
+/* Stili specifici di highlight.js (esempio) - assicurati che siano inclusi */
+.hljs-keyword { color: #569cd6; }
+.hljs-string { color: #ce9178; }
+.hljs-function .hljs-title { color: #dcdcaa; }
+.hljs-built_in { color: #4ec9b0; }
+.hljs-number { color: #b5cea8; }
+
+pre {
+  padding: 0.1rem;
+}
+
+.codebox {
+  position: relative;
+  padding: 1em;
+  background-color: #202020;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #ffffff91;
+  animation: neon-border-glow 6s linear infinite;
+}
+
+.dark-theme .hljs {
+  background: #000;
+  color: #fff;
+}
+
+pre code.hljs {
+  padding: 1.2em;
+  border-radius: 8px;
+}
+
+pre {
+  border: 0px solid var(--border-color);
+  box-shadow: none;
+}
